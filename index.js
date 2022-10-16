@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+const crypto = require('crypto');
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event, context) => {
@@ -9,18 +10,27 @@ exports.handler = async (event, context) => {
   };
   
   try {
-    let requestBody = JSON.parse(event.body); //JSON Object String
-    //let requestBody = event.body; //JSON Object
+    let requestBody = JSON.parse(event.body); //event.body as string
+    //let requestBody = event.body; //event.body as json object
+    let newID = crypto.createHash('md5').update(requestBody.email).digest('hex');
     await dynamo
           .put({
-            TableName: "Members", 
+            TableName: "Members",
             Item: {
-              id: requestBody.id,
-              name: requestBody.name
+              id: newID,
+              name: requestBody.name,
+              title: requestBody.title,
+              email: requestBody.email,
+              phone: requestBody.phone,
+              gender: requestBody.gender,
+              started: requestBody.started,
+              timezone: requestBody.timezone,
+              level: requestBody.level,
+              track: requestBody.track
             }
           })
           .promise();  
-    body = `Put item ${requestBody.id}`;
+    body = `Created item with id: ${newID}`;
   } catch (err) {
     statusCode = 400;
     body = err.message;
