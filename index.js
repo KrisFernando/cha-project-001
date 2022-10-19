@@ -10,11 +10,8 @@ exports.handler = async (event, context) => {
   };
   
   try {
-    if (typepf event.body === "string") {
-      let requestBody = JSON.parse(event.body); //event.body is a string for API Gateway
-    } else {
-      let requestBody = event.body; //event.body is a json object for Lambda testing
-    }
+    let requestBody = event.body; //event.body is a json object for Lambda testing
+    //let requestBody = JSON.parse(event.body); //event.body is a string for API Gateway
     let newID = crypto.createHash('md5').update(requestBody.email).digest('hex');
     await dynamo
           .put({
